@@ -3,11 +3,12 @@
 // Database configuration settings
 class Database
 {
-    private static $instance = null;
+    /** @var PDO $instance */
+    private static $connection = null;
 
-    public static function getInstance()
+    public static function getConnection()
     {
-        if (self::$instance === null) {
+        if (self::$connection === null) {
             $host     = '127.0.0.1';
             $dbname   = 'CNWeb_BTTH02';
             $username = 'root';
@@ -22,11 +23,12 @@ class Database
                     PDO::ATTR_EMULATE_PREPARES   => false,
                 ];
 
-                self::$instance = new PDO($dsn, $username, $password, $options);
+                self::$connection = new PDO($dsn, $username, $password, $options);
             } catch (PDOException $e) {
-                die('Kết nối thất bại: ' . $e->getMessage());
+                throw new PDOException($e->getMessage(), (int) $e->getCode());
             }
-            return self::$instance;
         }
+
+        return self::$connection;
     }
 }
