@@ -34,9 +34,42 @@ switch ($controller) {
 
     case 'admin':
         checkRole(2);
-        include 'views/admin/dashboard.php';
-        break;
+        require_once 'controllers/AdminController.php';
+        $adminController = new AdminController();
 
+        switch ($action) {
+            // 1. Quản lý user
+            case 'users':
+                $adminController->manageUsers();
+                break;
+            case 'edit_user':
+                $adminController->editUser();
+                break;
+            case 'delete_user':
+                $adminController->deleteUser();
+                break;
+
+            // 2. Quản lý danh mục (Thêm mới)
+            case 'categories':
+                $adminController->manageCategories();
+                break;
+
+            // 3. Duyệt khóa học (Thêm mới)
+            case 'approve_courses':
+                $adminController->approveCourses();
+                break;
+
+            // 4. Thống kê (Thêm mới)
+            case 'statistics':
+                $adminController->statistics();
+                break;
+
+            // Mặc định về Dashboard
+            default:
+                $adminController->dashboard();
+                break;
+        }
+        break;
     default:
         echo "404 Not Found";
         break;

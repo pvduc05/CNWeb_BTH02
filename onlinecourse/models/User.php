@@ -68,4 +68,73 @@ class User
         if ($stmt->rowCount() > 0) return true;
         return false;
     }
+    // 4. Lấy danh sách tất cả người dùng (Cho trang quản lý của Admin)
+    public function getAllUsers()
+    {
+        // Lấy thêm created_at để admin biết ngày tạo
+        $query = "SELECT id, username, email, fullname, role, created_at FROM " . $this->table_name . " ORDER BY created_at DESC";
+        $stmt = $this->conn->prepare($query);
+        $stmt->execute();
+        return $stmt;
+    }
+
+    // 5. Lấy thông tin chi tiết 1 user theo ID (Để hiển thị vào form Sửa)
+    public function getUserById($id)
+    {
+        $query = "SELECT id, username, email, fullname, role, created_at FROM " . $this->table_name . " WHERE id = ? LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $id);
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Gán giá trị vào thuộc tính của object nếu tìm thấy
+        if ($row) {
+            $this->id = $row['id'];
+            $this->username = $row['username'];
+            $this->email = $row['email'];
+            $this->fullname = $row['fullname'];
+            $this->role = $row['role'];
+        }
+        return $row;
+    }
+
+    // 6. Cập nhật thông tin User (Admin dùng để sửa Tên, Email, Quyền hạn)
+    public function update($id, $fullname, $email, $role)
+    {
+        $query = "UPDATE " . $this->table_name . " 
+                  SET fullname = :fullname, email = :email, role = :role 
+                  WHERE id = :id";
+
+        $stmt = $this->conn->prepare($query);
+
+        // Làm sạch dữ liệu
+        $fullname = htmlspecialchars(strip_tags($fullname));
+        $email = htmlspecialchars(strip_tags($email));
+        $role = htmlspecialchars(strip_tags($role));
+        $id = htmlspecialchars(strip_tags($id));
+
+        // Bind tham số
+        $stmt->bindParam(':fullname', $fullname);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':role', $role);
+        $stmt->bindParam(':id', $id);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
+
+    // 7. Xóa User
+    public function delete($id)
+    {
+        $query = "DELETE FROM " . $this->table_name . " WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $id);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+        return false;
+    }
 }

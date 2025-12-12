@@ -4,15 +4,11 @@ include_once 'models/User.php';
 
 class AuthController
 {
-    //private $db;
     private $user;
 
     public function __construct()
     {
-        // $database = new Database();
-        // $this->db = $database->getConnection();
-        // $this->user = new User($this->db);
-        // Khởi tạo User mà không cần truyền tham số
+
         $this->user = new User();
     }
 
