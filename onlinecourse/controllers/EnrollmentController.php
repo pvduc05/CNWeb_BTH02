@@ -26,7 +26,7 @@ class EnrollmentController {
         $studentId = $_SESSION['user']['id'];
 
         $success = $this->enrollmentModel->enrollCourse($courseId, $studentId);
-
+        
         if ($success) {
             // Đăng ký thành công
             header("Location: index.php?controller=enrollment&action=my_courses&success=1");
@@ -49,7 +49,7 @@ class EnrollmentController {
         $myCourses = $this->enrollmentModel->getMyCourses($studentId);
 
         // Gọi view
-        include "views/student/my_courses.php";
+        require_once "views/student/my_courses.php";
     }
         /*
     ================================

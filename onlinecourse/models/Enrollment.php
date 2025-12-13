@@ -74,15 +74,6 @@ class Enrollment {
             'student_id' => $studentId
         ]);
     }
-    public function getCoursesByStudent($studentId)
-{
-    $sql = "SELECT c.* FROM enrollments e 
-            INNER JOIN courses c ON e.course_id = c.id 
-            WHERE e.student_id = ?";
-    $stmt = $this->conn->prepare($sql);
-    $stmt->execute([$studentId]);
-    return $stmt->fetchAll();
-}
 
 }
 ?>

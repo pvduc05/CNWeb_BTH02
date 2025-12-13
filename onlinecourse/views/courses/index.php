@@ -1,4 +1,4 @@
-<?php include __DIR__ . "/../layouts/header.php"; ?>
+<?php require_once __DIR__ . "/../layouts/header.php"; ?>
 
 <div class="container mt-4">
 
@@ -8,14 +8,13 @@
    <form method="GET" action="index.php">
     <input type="hidden" name="controller" value="course">
     <input type="hidden" name="action" value="search">
-
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Nhập tên khóa học..." name="title_course">
         <button class="btn btn-primary">Tìm kiếm</button>
     </div>
     </form>
 
-    <!-- Lọc danh mục -->
+    <!-- kết quả tìm kiếm-->
     <?php if (isset($categoryInfo)): ?>
         <h5>Kết quả theo danh mục: <b><?= $categoryInfo['name'] ?></b></h5>
     <?php endif; ?>
@@ -40,4 +39,4 @@
 
 </div>
 
-<?php include __DIR__ . "/../layouts/footer.php"; ?>
+<?php require_once __DIR__ . "/../layouts/footer.php"; ?>

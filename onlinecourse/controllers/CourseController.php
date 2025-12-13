@@ -1,12 +1,15 @@
 <?php
 require_once(__DIR__ . '/../models/Course.php');
 require_once(__DIR__."/../models/Category.php");
+require_once(__DIR__ . '/../models/Enrollment.php');
 class CourseController {
     private $courseModel;
     private $categoryModel;
+    private $enrollmentModel;
     public function __construct() {
         $this->courseModel = new Course();
         $this->categoryModel = new Category();
+        $this->enrollmentModel = new Enrollment();
     }
        // ============================
     // 1. XEM DANH SÁCH KHÓA HỌC + LỌC DANH MỤC
@@ -29,8 +32,7 @@ class CourseController {
             $courses = $this->courseModel->getAll();
             $categoryInfo = null;
         } 
-
-        require __DIR__ . "/../views/courses/index.php";
+        require_once __DIR__ . "/../views/courses/index.php";
     }
      // ============================
     // 2. XEM CHI TIẾT KHÓA HỌC
@@ -44,7 +46,14 @@ class CourseController {
         if(!$course){
             die("Không tìm thấy khóa học");
         }
-        require __DIR__."/../views/courses/detail.php";
+         // Kiểm tra đã đăng ký chưa
+        $isEnrolled = false;
+        if (isset($_SESSION['user'])) {
+            $studentId = $_SESSION['user']['id'];
+            $isEnrolled = $this->enrollmentModel->isEnrolled($id, $studentId);
+        }
+
+        require_once __DIR__."/../views/courses/detail.php";
     }
     // ============================
     // 3. TÌM KIẾM KHÓA HỌC
@@ -60,7 +69,7 @@ class CourseController {
     }
 
     // Load giao diện
-    require __DIR__ . "/../views/courses/search.php";
+    require_once __DIR__ . "/../views/courses/search.php";
 }
     /*
     =====================================================
@@ -73,7 +82,6 @@ class CourseController {
         if (!isset($_GET['id'])) {
             die("Thiếu ID danh mục!");
         }
-
         $categoryId = $_GET['id'];
 
         // Lấy danh sách khóa học theo danh mục
@@ -84,7 +92,23 @@ class CourseController {
         }
 
         // Dùng chung view hiển thị danh sách khóa học
-        require "views/courses/index.php";
+        require_once "views/courses/index.php";
     }
+
+    /*
+    =====================================================
+    5.Hiển thị 3 khóa học nổi bật nhất 
+    =====================================================
+    */
+    public function indexThree()
+    {
+        $message = "";
+        $courses_home = $this->courseModel->getThree();
+        if (!$courses_home) {
+            $message = "Không có khóa học nào trong danh mục này.";
+        }
+        require_once "views/home/index.php";
+    }
+
 }
 ?>
