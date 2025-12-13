@@ -1,3 +1,5 @@
+<!-- trang chinh sua khoa hoc cua giang vien -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +8,7 @@
     <title>Chỉnh sửa khoá học</title>
 </head>
 <body>
-    <form action="index.php?action=update" method="post">
+    <form action="index.php?controller=instructor&type=course&action=update" method="post">
         <input type="hidden" name="id" value="<?php echo htmlspecialchars($course['id']); ?>">
         <input type="text" placeholder="Tên khoá học" name="title" value="<?php echo htmlspecialchars($course['title']) ?>"> <br>
         <input type="text" placeholder="Mô tả" name="description" value="<?php echo htmlspecialchars($course['description']) ?>"> <br>

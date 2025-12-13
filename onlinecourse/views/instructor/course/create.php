@@ -1,3 +1,5 @@
+<!-- trang hien form them khoa hoc cua giang vien -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,8 +8,8 @@
     <title>Thêm khoá học</title>
 </head>
 <body>
-    <form action="index.php?action=store" method="post">
-        <input type="text" placeholder="Tên khoá học" name="title" value=""> <br>
+    <form action="index.php?controller=instructor&type=course&action=store" method="post">
+        <input type="text" placeholder="Tên khoá học" name="title"> <br>
         <input type="text" placeholder="Mô tả" name="description"> <br>
         <input type="text" placeholder="Người đăng" name="instructorId"> <br>
         <input type="text" placeholder="Danh mục" name="categoryId"> <br>
@@ -18,6 +20,6 @@
         <input type="submit" value="Thêm khoá học" name="submit">
     </form>
 
-    <button><a href="index.php?action=index">Xem danh sách khoá học</a></button>
+    <button><a href="index.php?controller=instructor&type=course&action=my_courses">Xem danh sách khoá học</a></button>
 </body>
 </html>

@@ -1,3 +1,5 @@
+<!-- trang chu khi lan dau ghe tham trang (truoc khi dang nhap) -->
+
 <?php include __DIR__ . '/../layouts/header.php'; ?>
 <?php include __DIR__ . '/../layouts/sidebar.php'; ?>
 

@@ -13,14 +13,17 @@ class Course
     }
 
     //lay toan bo khoa hoc
-    public function getAllCourse(): array
+    public function getAllCourse(int $instructorId): array
     {
         if ($this->conn === null) {
             return [];
         }
 
-        $sql  = 'SELECT * FROM Courses';
-        $stmt = $this->conn->query($sql);
+        $sql  = 'SELECT * FROM Courses WHERE instructor_id = :instructor_id';
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            ':instructor_id' => $instructorId,
+        ]);
         return $stmt->fetchAll();
     }
 
@@ -85,15 +88,15 @@ class Course
         }
 
         // xoa khoa hoc
-        $sql                  = 'DELETE FROM Courses WHERE id = :course_id';
-        $stmt                 = $this->conn->prepare($sql);
+        $sql = 'DELETE FROM Courses WHERE id = :course_id';
+        $stmt = $this->conn->prepare($sql);
         $deletedCourseSuccess = $stmt->execute([
             ':course_id' => $courseId,
         ]);
 
         //xoa bai hoc thuoc khoa hoc
-        $sql                   = 'DELETE FROM Lessons WHERE course_id = :course_id';
-        $stmt                  = $this->conn->prepare($sql);
+        $sql = 'DELETE FROM Lessons WHERE course_id = :course_id';
+        $stmt = $this->conn->prepare($sql);
         $deletedLessonsSuccess = $stmt->execute([
             ':course_id' => $courseId,
         ]);

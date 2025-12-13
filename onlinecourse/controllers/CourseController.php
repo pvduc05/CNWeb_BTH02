@@ -1,32 +1,36 @@
 <?php
 
 require_once 'models/Course.php';
+require_once 'models/Lesson.php';
 
 class CourseController {
-    private $courseModel;
+    private $courseModel;   
+    private $lessonModel;
 
     public function __construct() {
         $this->courseModel = new Course();
+        $this->lessonModel = new Lesson();
+    }
+
+    //hien thi trang dashboard giang vien
+    public function index() : void {
+        include 'views/instructor/dashboard.php';
     }
 
     //hien thi danh sach khoa hoc
-    public function index() {
-        $courses = $this->courseModel->getAllCourse();
+    public function myCourses() : void {
+        $courses = $this->courseModel->getAllCourse(1);
 
-        if (count($courses) === 0) {
-            echo "<p>Không có khoá học nào!</p>";
-        }
-
-        include 'views/instructor/course/manage.php';
+        include 'views/instructor/my_courses.php';
     }
 
     //hien thi form them khoa hoc
-    public function create() {
+    public function create() : void {
         include 'views/instructor/course/create.php';
     }
 
     //xy ly them khoa hoc
-    public function store() {
+    public function store() : void {
         if (isset($_POST['submit']) && $_POST['submit'] === 'Thêm khoá học') {
             $title = $_POST['title'] ?? '';
             $description = $_POST['description'] ?? '';
@@ -37,51 +41,47 @@ class CourseController {
             $level = $_POST['level'] ?? '';
             $image = $_POST['image'] ?? '';
 
-            $timezone = new DateTimeZone('Asia/Ho_Chi_Minh');
+            date_default_timezone_set('Asia/Ho_Chi_Minh'); // set timezone
             $createdAt = date('Y-m-d H-i-s');
 
             $isSuccess = $this->courseModel->addCourse($title, $description, $instructorId, $categoryId, $price, $durationWeeks, $level, $image, $createdAt);
 
-            if ($isSuccess) {
-                echo 'Thêm khoá học thành công!';
-            } else {
-                echo 'Thêm khoá học thất bại!';
-            }
+            $message = $isSuccess ? 'Thêm khoá học thành công!' : 'Thêm khoá học thất bại!';
 
-            include 'views/instructor/course/create.php';
+            echo $message;
+
+            include_once 'views/instructor/course/create.php';
         }
     }
 
-    //xu
-    public function delete() {
+    //xu ly xoa khoa hoc
+    public function delete() : void {
         if (isset($_POST['submit']) && $_POST['submit'] === 'Xoá') {
             $courseId = $_POST['course_id'] ?? '';
 
             $isDeleted = $this->courseModel->deleteCourse($courseId);
 
-            if ($isDeleted) {
-                echo 'Xoá khoá học thành công!';
-            } else {
-                echo 'Xoá khoá học thất bại!';
-            }
+            $message = $isDeleted ? 'Xoá khoá học thành công!' : 'Xoá khoá học thất bại!';
 
-            header('Location: index.php?action=index');
+            echo $message;
+
+            header('Location: index.php?controller=instructor&type=course&action=my_courses');
             exit();
         }
     }
 
     //hien thi form chinh sua khoa hoc
-    public function edit() {
+    public function edit() : void {
         $id = $_POST['course_id'] ?? '';
 
         $course = $this->courseModel->getCourseById($id);
 
-        include 'views/instructor/course/edit.php';
+        include_once 'views/instructor/course/edit.php';
     }
 
     //xu ly chinh sua khoa hoc
-    public function update() {
-        if (isset($_POST['submit']) && $_POST['submit'] === 'Thêm khoá học') {
+    public function update() : void {
+        if (isset($_POST['submit']) && $_POST['submit'] === 'Sửa khoá học') {
             $id = $_POST['id'] ?? '';
             $title = $_POST['title'] ?? '';
             $description = $_POST['description'] ?? '';
@@ -92,18 +92,26 @@ class CourseController {
             $level = $_POST['level'] ?? '';
             $image = $_POST['image'] ?? '';
 
-            $timezone = new DateTimeZone('Asia/Ho_Chi_Minh');
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
             $updatedAt = date('Y-m-d H-i-s');
 
             $isSuccess = $this->courseModel->updateCourse($id, $title, $description, $instructorId, $categoryId, $price, $durationWeeks, $level, $image, $updatedAt);
 
-            if ($isSuccess) {
-                echo 'Chỉnh sửa khoá học thành công!';
-            } else {
-                echo 'Chỉnh sửa khoá học thất bại!';
-            }
+            $message = $isSuccess ? 'Cập nhật khoá học thành công!' : 'Cập nhật khoá học thất bại!';
 
-            include 'views/instructor/course/edit.php';
+            echo $message;
+
+            include_once 'views/instructor/course/edit.php';
         }
+    }
+
+    //hien thi trang quan ly 1 khoa hoc cu the
+    public function manage() : void {
+        $courseId = $_POST['course_id'] ?? '';
+
+        $course = $this->courseModel->getCourseById($courseId);
+        $lessons = $this->lessonModel->getAllLessonsByCourseId($courseId);
+
+        include_once 'views/instructor/course/manage.php';
     }
 }

@@ -16,7 +16,7 @@ class Lesson {
             return [];
         }
 
-        $sql = 'SELECT * FROM Lessons WHERE course_id = :course_id';
+        $sql = 'SELECT * FROM Lessons WHERE course_id = :course_id ORDER BY order_lesson ASC';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([':course_id' => $courseId]);
         return $stmt->fetchAll();
