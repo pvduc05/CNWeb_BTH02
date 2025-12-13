@@ -33,12 +33,11 @@ switch ($controller) {
         break;
 
     case 'admin':
-        checkRole(2);
+        checkRole(2); // Chỉ Admin mới vào được
         require_once 'controllers/AdminController.php';
         $adminController = new AdminController();
-
         switch ($action) {
-            // 1. Quản lý user
+            // 1. Quản lý User
             case 'users':
                 $adminController->manageUsers();
                 break;
@@ -49,22 +48,29 @@ switch ($controller) {
                 $adminController->deleteUser();
                 break;
 
-            // 2. Quản lý danh mục (Thêm mới)
-            case 'categories':
-                $adminController->manageCategories();
+            // 2. Quản lý Danh mục (Categories)
+            case 'categories':          // Xem danh sách
+                $adminController->listCategories();
+                break;
+            case 'create_category':     // Form thêm mới & Xử lý thêm
+                $adminController->createCategory();
+                break;
+            case 'edit_category':       // Form sửa & Xử lý sửa
+                $adminController->editCategory();
+                break;
+            case 'delete_category':     // Xử lý xóa
+                $adminController->deleteCategory();
                 break;
 
-            // 3. Duyệt khóa học (Thêm mới)
-            case 'approve_courses':
-                $adminController->approveCourses();
-                break;
-
-            // 4. Thống kê (Thêm mới)
-            case 'statistics':
-                $adminController->statistics();
-                break;
-
-            // Mặc định về Dashboard
+            // 3. Các chức năng khác (Để nút bấm trên Dashboard hoạt động)
+            // case 'approve_courses':     // Duyệt khóa học
+            //     $adminController->approveCourses();
+            //     break;
+            // case 'statistics':          // Thống kê
+            //     $adminController->statistics();
+            //     break;
+            // Mặc định: Về Dashboard Admin
+            case 'dashboard':
             default:
                 $adminController->dashboard();
                 break;
