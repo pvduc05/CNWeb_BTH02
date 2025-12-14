@@ -19,7 +19,10 @@ class Course
             return [];
         }
 
-        $sql  = 'SELECT * FROM Courses WHERE instructor_id = :instructor_id';
+        $sql  = 'SELECT c.*, cat.name as category_name FROM Courses c 
+                 LEFT JOIN Categories cat ON c.category_id = cat.id 
+                 WHERE c.instructor_id = :instructor_id 
+                 ORDER BY c.created_at DESC';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':instructor_id' => $instructorId,
@@ -34,7 +37,7 @@ class Course
             return false;
         }
 
-        $sql = 'INSERT INTO Courses (title, description, instructor_id, category_id, price, duration_weeks, level_course, image, created_at)
+        $sql = 'INSERT INTO Courses (title, description, instructor_id, category_id, price, duration_weeks, level, image, created_at)
                 VALUES (:title, :description, :instructor_id, :category_id, :price, :duration_weeks, :level, :image, :created_at)';
 
         $stmt = $this->conn->prepare($sql);
@@ -61,7 +64,7 @@ class Course
 
         $sql = 'UPDATE Courses
                 SET title = :title, description = :description, instructor_id = :instructor_id, category_id = :category_id,
-                    price = :price, duration_weeks = :duration_weeks, level_course = :level, image = :image , updated_at = :updated_at
+                    price = :price, duration_weeks = :duration_weeks, level = :level, image = :image , updated_at = :updated_at
                 WHERE id = :course_id';
 
         $stmt = $this->conn->prepare($sql);
@@ -87,17 +90,17 @@ class Course
             return false;
         }
 
-        // xoa khoa hoc
-        $sql = 'DELETE FROM Courses WHERE id = :course_id';
-        $stmt = $this->conn->prepare($sql);
-        $deletedCourseSuccess = $stmt->execute([
+        //xoa bai hoc thuoc khoa hoc
+        $sql                   = 'DELETE FROM Lessons WHERE course_id = :course_id';
+        $stmt                  = $this->conn->prepare($sql);
+        $deletedLessonsSuccess = $stmt->execute([
             ':course_id' => $courseId,
         ]);
 
-        //xoa bai hoc thuoc khoa hoc
-        $sql = 'DELETE FROM Lessons WHERE course_id = :course_id';
-        $stmt = $this->conn->prepare($sql);
-        $deletedLessonsSuccess = $stmt->execute([
+        // xoa khoa hoc
+        $sql                  = 'DELETE FROM Courses WHERE id = :course_id';
+        $stmt                 = $this->conn->prepare($sql);
+        $deletedCourseSuccess = $stmt->execute([
             ':course_id' => $courseId,
         ]);
 
@@ -112,7 +115,9 @@ class Course
             return [];
         }
 
-        $sql  = 'SELECT * FROM Courses WHERE id = :course_id';
+        $sql  = 'SELECT c.*, cat.name as category_name FROM Courses c 
+                 LEFT JOIN Categories cat ON c.category_id = cat.id 
+                 WHERE c.id = :course_id';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':course_id' => $courseId,
