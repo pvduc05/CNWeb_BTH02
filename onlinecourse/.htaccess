@@ -1,1 +1,8 @@
+RewriteEngine On
 
+# Nếu request không phải là file thực tế hoặc thư mục thực tế
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Chuyển hướng tất cả vào index.php và GIỮ LẠI tham số truy vấn (QSA)
+RewriteRule ^(.*)$ index.php [QSA,L]

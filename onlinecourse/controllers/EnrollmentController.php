@@ -1,7 +1,8 @@
 <?php
-require_once __DIR__."/../models/Enrollment.php";
+require_once __DIR__ . "/../models/Enrollment.php";
 
-class EnrollmentController {
+class EnrollmentController
+{
     private $enrollmentModel;
     public function __construct()
     {
@@ -17,8 +18,9 @@ class EnrollmentController {
     GHI DANH KHÓA HỌC
     index.php?controller=enrollment&action=enroll&course_id=1
     ================================
-    */    
-    public function enroll() {
+    */
+    public function enroll()
+    {
         if (!isset($_GET['course_id'])) {
             die("Thiếu course_id!");
         }
@@ -26,7 +28,7 @@ class EnrollmentController {
         $studentId = $_SESSION['user']['id'];
 
         $success = $this->enrollmentModel->enrollCourse($courseId, $studentId);
-        
+
         if ($success) {
             // Đăng ký thành công
             header("Location: index.php?controller=enrollment&action=my_courses&success=1");
@@ -51,7 +53,7 @@ class EnrollmentController {
         // Gọi view
         require_once "views/student/my_courses.php";
     }
-        /*
+    /*
     ================================
     CẬP NHẬT TIẾN ĐỘ (Progress)
     index.php?controller=enrollment&action=update_progress
@@ -62,15 +64,19 @@ class EnrollmentController {
         if (!isset($_POST['course_id']) || !isset($_POST['progress'])) {
             die("Thiếu dữ liệu cập nhật tiến độ!");
         }
-
-        $courseId   = $_POST['course_id'];
-        $studentId  = $_SESSION['user']['id'];
-        $progress   = intval($_POST['progress']);
-
-        $this->enrollmentModel->trackProgress($courseId, $studentId, $progress);
+        $rawCourseId = $_POST['course_id'];
+        $rawStudentId = $_SESSION['user']['id'];
+        $rawProgress = $_POST['progress'];
+        $courseId  = (int)$rawCourseId;
+        $studentId = (int)$rawStudentId;
+        $progress  = intval($rawProgress);
+        // $courseId   = $_POST['course_id'];
+        // $studentId  = $_SESSION['user']['id'];
+        // $progress   = intval($_POST['progress']);
+        
+        $this->enrollmentModel->trackProgress($progress, $courseId, $studentId);
 
         header("Location: index.php?controller=enrollment&action=my_courses&updated=1");
         exit;
     }
 }
-?>

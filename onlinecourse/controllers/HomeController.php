@@ -1,32 +1,24 @@
 <?php
-include_once(__DIR__ . '/../models/Course.php');
-include_once(__DIR__ . '/../models/Category.php');
+// controllers/HomeController.php
 
-class HomeController {
-    private $courseModel;
-    private $categoryModel;
+class HomeController
+{
 
-    public function __construct() {
-        $this->courseModel = new Course();
-        $this->categoryModel = new Category();
-    }
+    // Phương thức mặc định cho trang chủ
+    public function index()
+    {
+        // 1. Logic lấy dữ liệu (Model)
+        // Trong dự án khóa học online, đây sẽ là nơi bạn gọi Model Course
+        // để lấy danh sách các khóa học nổi bật hoặc mới nhất.
 
-    public function index() {
-        $courses = $this->courseModel->getAll();
-        $categories = $this->categoryModel->getAll();
+        // Ví dụ: $latest_courses = $courseModel->getLatestCourses(5);
 
-        $data = [
-            'courses' => $courses,
-            'categories' => $categories
-        ];
+        // 2. Tải View
+        // Truyền dữ liệu (nếu có) vào View và tải giao diện
+        // include 'views/home/index.php';
 
-        $this->renderView("home/index", $data);
-    }
+        // Hiện tại, vì chúng ta chưa xây dựng Course Model, ta chỉ cần include View.
 
-    private function renderView($view, $data = []) {
-        extract($data);
-        include(__DIR__."/../views/layouts/header.php");
-        include(__DIR__."/../views/".$view.".php");
-        include(__DIR__."/../views/layouts/footer.php");
+        include 'views/home/index.php';
     }
 }

@@ -9,7 +9,7 @@
     <?php else: ?>
 
         <div class="row mt-3">
-            <?php foreach($course_search as $c): ?>
+            <?php foreach ($course_search as $c): ?>
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm">
                         <img src="assets/uploads/courses/<?= $c['image'] ?>" class="card-img-top" height="200" style="object-fit:cover">

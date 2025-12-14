@@ -1,8 +1,12 @@
-<footer class="bg-dark text-white text-center py-3 mt-5">
-    <p>© 2024 OnlineCourse - All rights reserved.</p>
-</footer>
+    </div> <!-- row -->
+    </div> <!-- container -->
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <footer class="bg-dark text-white text-center p-3 mt-5">
+        © 2025 OnlineCourse - All rights reserved.
+    </footer>
 
-</body>
-</html>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    </body>
+
+    </html>

@@ -5,8 +5,8 @@
 
     <div class="row mt-4">
         <div class="col-md-5">
-            <img src="assets/uploads/courses/<?php echo $course['image']; ?>" 
-                 class="img-fluid rounded shadow-sm">
+            <img src="assets/uploads/courses/<?php echo $course['image']; ?>"
+                class="img-fluid rounded shadow-sm">
         </div>
 
         <div class="col-md-7">
@@ -20,40 +20,40 @@
 
             <p><strong>Cấp độ:</strong> <?php echo $course['level']; ?></p>
 
-            <p><strong>Giá:</strong> 
+            <p><strong>Giá:</strong>
                 <span class="text-danger fw-bold">
-                    <?php echo number_format($course['price']); ?> USD 
+                    <?php echo number_format($course['price']); ?> USD
                 </span>
             </p>
             <?php if (!isset($_SESSION['user'])): ?>
 
-    <!-- Chưa đăng nhập -->
-    <a href="index.php?controller=auth&action=login" 
-       class="btn btn-warning">
-        Đăng nhập để đăng ký
-    </a>
+                <!-- Chưa đăng nhập -->
+                <a href="index.php?controller=auth&action=login"
+                    class="btn btn-warning">
+                    Đăng nhập để đăng ký
+                </a>
 
-<?php else: ?>
+            <?php else: ?>
 
-    <?php if ($isEnrolled): ?>
-        <!-- Đã đăng ký -->
-        <button class="btn btn-secondary" disabled>
-            Đã đăng ký
-        </button>
-    <?php else: ?>
-        <!-- Chưa đăng ký -->
-        <a href="index.php?controller=enrollment&action=enroll&course_id=<?= $course['id'] ?>"
-           class="btn btn-success"
-           onclick="return confirm('Bạn có chắc muốn đăng ký khóa học này?')">
-            Đăng ký khóa học
-        </a>
-    <?php endif; ?>
+                <?php if ($isEnrolled): ?>
+                    <!-- Đã đăng ký -->
+                    <button class="btn btn-secondary" disabled>
+                        Đã đăng ký
+                    </button>
+                <?php else: ?>
+                    <!-- Chưa đăng ký -->
+                    <a href="index.php?controller=enrollment&action=enroll&course_id=<?= $course['id'] ?>"
+                        class="btn btn-success"
+                        onclick="return confirm('Bạn có chắc muốn đăng ký khóa học này?')">
+                        Đăng ký khóa học
+                    </a>
+                <?php endif; ?>
 
-<?php endif; ?>
+            <?php endif; ?>
 
 
         </div>
-    </div> 
+    </div>
 
 </div>
 
