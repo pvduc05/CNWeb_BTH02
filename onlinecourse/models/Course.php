@@ -7,6 +7,7 @@ class Course
 {
     /** @var PDO $conn */
     private $conn;
+    private $table = 'courses';
 
     public function __construct()
     {
@@ -198,5 +199,28 @@ class Course
         $stmt = $this->conn->prepare($sql_select);
         $stmt->execute(['title' => '%' . $title . '%']);
         return $stmt->fetchAll();
+    }
+   //lọc theo id
+   public function filterByCategoryId($categoryId)
+    {
+        $sql_select = "
+            SELECT 
+                id, title, description, price, duration_weeks, level, image 
+            FROM " . $this->table . "
+        ";
+        $params = [];
+        
+        // Nếu có categoryId hợp lệ, thêm điều kiện WHERE
+        if (!empty($categoryId) && is_numeric($categoryId)) {
+            $sql_select .= " WHERE category_id = :category_id ";
+            $params[':category_id'] = $categoryId;
+        }
+
+        $sql_select .= " ORDER BY id ASC";
+        
+        $stmt = $this->conn->prepare($sql_select);
+        $stmt->execute($params);
+        
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

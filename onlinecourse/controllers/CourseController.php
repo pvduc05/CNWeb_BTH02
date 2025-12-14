@@ -154,6 +154,8 @@ class CourseController
             $courses = $this->courseModel->getAll();
             $categoryInfo = null;
         }
+        $categoriesStmt = $this->categoryModel->getAll();
+        $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC);
         require_once __DIR__ . "/../views/courses/index.php";
     }
 
@@ -201,6 +203,34 @@ class CourseController
     URL: index.php?controller=course&action=category&id=2
     =====================================================
     */
+public function filter_category()
+    {
+        $categoryId = $_GET['category_id'] ?? ''; // Lấy ID danh mục từ form GET
+
+        $categoryInfo = null;
+        
+        // 1. Nếu có ID danh mục được chọn
+        if (!empty($categoryId) && is_numeric($categoryId)) {
+            // Lấy thông tin chi tiết danh mục (sử dụng getById)
+            $categoryInfo = $this->categoryModel->getById($categoryId); 
+            
+            // Hàm getById trong Category.php của bạn trả về row hoặc null
+            if ($categoryInfo) {
+                // Nếu tìm thấy, giữ nguyên $categoryId để lọc
+                $categoryId = $categoryInfo['id'];
+            }
+        }
+        
+        // 2. Lấy danh sách khóa học theo ID (hoặc tất cả nếu ID rỗng)
+        $courses = $this->courseModel->filterByCategoryId($categoryId);
+
+        // 3. Lấy lại danh sách TẤT CẢ danh mục để đổ vào form SELECT
+        $categoriesStmt = $this->categoryModel->getAll();
+        $categories = $categoriesStmt->fetchAll(PDO::FETCH_ASSOC); 
+
+        // 4. Load View
+        require_once "views/courses/index.php";
+    }
     public function category()
     {
         if (!isset($_GET['id'])) {
