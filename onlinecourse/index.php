@@ -68,15 +68,19 @@
                 case 'manage':
                     $dynamicController->manage();
                     break;
+
                 // Materials actions
                 case 'materials':
                     $dynamicController->materials();
                     break;
-                case 'upload_material':
-                    $dynamicController->uploadMaterial();
+                case 'upload':
+                    $dynamicController->upload();
                     break;
-                case 'delete_material':
-                    $dynamicController->deleteMaterial();
+                case 'upload_material':
+                    $dynamicController->uploadLogic();
+                    break;
+                case 'students':
+                    $dynamicController->students();
                     break;
                 default:
                     echo 'Hanh dong khong hop le.';

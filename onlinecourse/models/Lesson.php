@@ -54,14 +54,13 @@ class Lesson
             return false;
         }
 
-        $sql  = 'DELETE FROM Lessons WHERE id = :lesson_id';
-        $stmt = $this->conn->prepare($sql);
-        $deletedLesson = $stmt->execute([':lesson_id' => $lessonId]);
-
-
         $sql = 'DELETE FROM Materials WHERE lesson_id = :lesson_id';
         $stmt = $this->conn->prepare($sql);
         $deletedMaterials = $stmt->execute([':lesson_id' => $lessonId]);
+
+        $sql  = 'DELETE FROM Lessons WHERE id = :lesson_id';
+        $stmt = $this->conn->prepare($sql);
+        $deletedLesson = $stmt->execute([':lesson_id' => $lessonId]);
 
         return $deletedLesson && $deletedMaterials;
     }

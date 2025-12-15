@@ -1,6 +1,7 @@
 <?php
 
 require_once 'config/Database.php';
+require_once 'models/Lesson.php';
 
 class Course
 {
@@ -90,6 +91,14 @@ class Course
             return false;
         }
 
+        //xoa tai lieu thuoc bai hoc
+        $sql = 'DELETE m
+            FROM materials m
+            JOIN lessons l ON m.lesson_id = l.id
+            WHERE l.course_id = :course_id';
+        $stmt = $this->conn->prepare($sql);
+        $deletedMaterialsSuccess = $stmt->execute([':course_id' => $courseId]);
+
         //xoa bai hoc thuoc khoa hoc
         $sql                   = 'DELETE FROM Lessons WHERE course_id = :course_id';
         $stmt                  = $this->conn->prepare($sql);
@@ -105,7 +114,7 @@ class Course
         ]);
 
         // neu xoa khoa hoc va bai hoc thanh cong thi tra ve true
-        return $deletedCourseSuccess && $deletedLessonsSuccess;
+        return $deletedMaterialsSuccess && $deletedCourseSuccess && $deletedLessonsSuccess;
     }
 
     //lay khoa hoc theo id

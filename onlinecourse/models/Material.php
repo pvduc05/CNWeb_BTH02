@@ -24,37 +24,23 @@ class Material
         return $stmt->fetchAll();
     }
 
-    public function addMaterial(int $lessonId, string $title, string $description, string $fileName, string $filePath, string $fileType, string $uploadedAt): bool
+    public function addMaterial(int $lessonId, string $fileName, string $filePath, string $fileType, string $uploadedAt): bool
     {
         if ($this->conn === null) {
             return false;
         }
 
-        $sql = 'INSERT INTO Materials (lesson_id, title, description, file_name, file_path, file_type, uploaded_at)
-                VALUES (:lesson_id, :title, :description, :file_name, :file_path, :file_type, :uploaded_at)';
+        $sql = 'INSERT INTO Materials (lesson_id, filename, file_path, file_type, uploaded_at)
+                VALUES (:lesson_id, :file_name, :file_path, :file_type, :uploaded_at)';
 
         $stmt = $this->conn->prepare($sql);
 
         return $stmt->execute([
             ':lesson_id'   => $lessonId,
-            ':title'       => $title,
-            ':description' => $description,
             ':file_name'   => $fileName,
             ':file_path'   => $filePath,
             ':file_type'   => $fileType,
             ':uploaded_at' => $uploadedAt,
         ]);
-    }
-
-    public function deleteMaterial(int $materialId): bool
-    {
-        if ($this->conn === null) {
-            return false;
-        }
-
-        $sql  = 'DELETE FROM Materials WHERE id = :material_id';
-        $stmt = $this->conn->prepare($sql);
-
-        return $stmt->execute([':material_id' => $materialId]);
     }
 }

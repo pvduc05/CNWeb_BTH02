@@ -2,16 +2,6 @@
 
 <?php
     include_once __DIR__ . '/../../layouts/header.php';
-
-    // Hiển thị thông báo nếu có
-    if (isset($_GET['message'])) {
-        $message = urldecode($_GET['message']);
-        $alertClass = strpos($message, 'thành công') !== false ? 'alert-success' : 'alert-danger';
-        echo '<div class="alert ' . $alertClass . ' alert-dismissible fade show" role="alert">
-                ' . htmlspecialchars($message) . '
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>';
-    }
 ?>
 
 <div class="container-fluid mt-4">
@@ -210,19 +200,20 @@
                                                     </button>
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <form action="index.php?controller=instructor&type=lesson&action=upload_material" method="post" class="d-inline w-100">
+                                                            <form action="index.php?controller=instructor&type=lesson&action=materials" method="post" class="d-inline w-100">
                                                                 <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
                                                                 <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                                                <button type="submit" 
+
+                                                                <button type="submit"
                                                                 value="Đăng tải"
                                                                 class="dropdown-item">
-                                                                    <i class="fas fa-file-upload me-2"></i>Quản lý tài liệu
+                                                                    <i class="fas fa-file-upload me-2"></i>Quản lý bài học
                                                                 </button>
                                                             </form>
                                                         </li>
                                                         <li><hr class="dropdown-divider"></li>
                                                         <li>
-                                                            <form action="index.php?controller=instructor&type=lesson&action=delete_material" method="post" class="d-inline w-100"
+                                                            <form action="index.php?controller=instructor&type=lesson&action=delete" method="post" class="d-inline w-100"
                                                                   onsubmit="return confirm('Bạn có chắc muốn xóa bài học này?')">
                                                                 <input type="hidden" name="lesson_id" value="<?php echo $lesson['id']; ?>">
                                                                 <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">

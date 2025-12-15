@@ -12,8 +12,8 @@ class LessonController
 
     public function __construct()
     {
-        $this->lessonModel = new Lesson();
-        $this->courseModel = new Course();
+        $this->lessonModel   = new Lesson();
+        $this->courseModel   = new Course();
         $this->materialModel = new Material();
     }
 
@@ -51,8 +51,6 @@ class LessonController
 
             $message = $isSuccess ? 'Thêm bài học thành công.' : 'Thêm bài học thất bại.';
 
-            echo $message;
-
             header('Location: index.php?controller=instructor&type=course&action=manage&course_id=' . $courseId);
             exit();
         }
@@ -62,7 +60,6 @@ class LessonController
     public function edit(): void
     {
         $lessonId = $_POST['lesson_id'] ?? '';
-        $courseId = $_POST['course_id'] ?? '';
 
         $lesson = $this->lessonModel->getLessonById($lessonId);
 
@@ -90,113 +87,85 @@ class LessonController
         }
     }
 
-    // xu ly upload tai lieu
-    public function uploadMaterial(): void
+    //xu ly logic xoa bai hoc
+    public function delete(): void
     {
-        if (isset($_POST['submit']) && $_POST['submit'] === 'Đăng tải') {
-            $lessonId = $_POST['lesson_id'] ?? '';
-            $courseId = $_POST['course_id'] ?? '';
-            $title = $_POST['title'] ?? '';
-            $description = $_POST['description'] ?? '';
+        if (isset($_POST['submit'])) {
+            $lessonId = $_POST['lesson_id'];
+            $courseId = $_POST['course_id'];
 
-            // Handle file upload
-            if (isset($_FILES['file']) && $_FILES['file']['error'] == UPLOAD_ERR_OK) {
-                $uploadDir = 'uploads/materials/';
+            $isSuccess = $this->lessonModel->deleteLesson($lessonId);
 
-                // Create directory if not exists
-                if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0777, true);
-                }
-
-                $originalFileName = basename($_FILES['file']['name']);
-                $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-                $newFileName = uniqid() . '_' . time() . '.' . $fileExtension;
-                $targetFile = $uploadDir . $newFileName;
-
-                // Check file size (50MB max)
-                if ($_FILES['file']['size'] > 50 * 1024 * 1024) {
-                    $message = 'File quá lớn! Tối đa 50MB.';
-                    header('Location: index.php?controller=instructor&type=lesson&action=materials&lesson_id=' . $lessonId . '&course_id=' . $courseId . '&message=' . urlencode($message));
-                    exit();
-                }
-
-                // Allowed file types
-                $allowedTypes = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip', 'rar'];
-                if (!in_array(strtolower($fileExtension), $allowedTypes)) {
-                    $message = 'Loại file không được hỗ trợ!';
-                    header('Location: index.php?controller=instructor&type=lesson&action=manageMaterials&lesson_id=' . $lessonId . '&course_id=' . $courseId . '&message=' . urlencode($message));
-                    exit();
-                }
-
-                if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
-                    date_default_timezone_set('Asia/Ho_Chi_Minh');
-                    $uploadedAt = date('Y-m-d H:i:s');
-
-                    $isSuccess = $this->materialModel->addMaterial($lessonId, $title, $description, $originalFileName, $newFileName, $fileExtension, $uploadedAt);
-
-                    $message = $isSuccess ? 'Upload tài liệu thành công!' : 'Upload tài liệu thất bại!';
-                } else {
-                    $message = 'Upload file thất bại!';
-                }
-            } else {
-                $message = 'Vui lòng chọn file!';
-            }
-
-            header('Location: index.php?controller=instructor&type=lesson&action=upload_material&lesson_id=' . $lessonId . '&course_id=' . $courseId . '&message=' . urlencode($message));
+            header('Location: index.php?controller=instructor&type=course&action=manage&course_id=' . $courseId);
             exit();
         }
     }
 
-    // xu ly xoa tai lieu
-    public function deleteMaterial(): void
-    {
-        if (isset($_POST['submit']) && $_POST['submit'] === 'Xóa') {
-            $materialId = $_POST['material_id'] ?? '';
-            $lessonId = $_POST['lesson_id'] ?? '';
-            $courseId = $_POST['course_id'] ?? '';
-
-            // Get material info to delete file
-            $materials = $this->materialModel->getAllMaterialsByLessonId($lessonId);
-            $material = array_filter($materials, function($m) use ($materialId) {
-                return $m['id'] == $materialId;
-            });
-
-            if (!empty($material)) {
-                $material = reset($material);
-                $filePath = 'uploads/materials/' . $material['file_path'];
-
-                // Delete file from server
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-
-                // Delete from database
-                $isSuccess = $this->materialModel->deleteMaterial($materialId);
-                $message = $isSuccess ? 'Xóa tài liệu thành công!' : 'Xóa tài liệu thất bại!';
-            } else {
-                $message = 'Tài liệu không tồn tại!';
-            }
-
-            header('Location: index.php?controller=instructor&type=lesson&action=delete_materials&lesson_id=' . $lessonId . '&course_id=' . $courseId . '&message=' . urlencode($message));
-            exit();
-        }
-    }
-
-    // hien thi trang upload tai lieu cho bai hoc
+    // hien thi danh sach cac tai lieu
     public function materials(): void
     {
         $lessonId = $_POST['lesson_id'] ?? $_GET['lesson_id'] ?? '';
         $courseId = $_POST['course_id'] ?? $_GET['course_id'] ?? '';
 
-        if (!$lessonId) {
-            header('Location: index.php?controller=instructor&type=course&action=manage&course_id=' . $courseId);
-            exit();
-        }
-
-        $lesson = $this->lessonModel->getLessonById($lessonId);
         $course = $this->courseModel->getCourseById($courseId);
 
-        $materials     = $this->materialModel->getAllMaterialsByLessonId($lessonId);
-        include 'views/instructor/lessons/manage.php';
+        $lesson    = $this->lessonModel->getLessonById($lessonId);
+        $materials = $this->materialModel->getAllMaterialsByLessonId($lessonId);
+
+        include_once 'views/instructor/lessons/manage.php';
+    }
+
+    // hien thi trang upload tai lieu
+    public function upload()
+    {
+        $lessonId = $_GET['lesson_id'] ?? '';
+
+        $courseId = $_GET['course_id'];
+
+        $lesson = $this->lessonModel->getLessonById($lessonId);
+        include_once 'views/instructor/materials/upload.php';
+    }
+
+    public function uploadLogic()
+    {
+        if (!isset($_POST['submit'])) {
+            return;
+        }
+
+        $lessonId = $_POST['lesson_id'] ?? $_GET['lesson_id'] ?? null;
+        $courseId = $_POST['course_id'] ?? $_GET['course_id'] ?? null;
+
+        if (!$lessonId || !$courseId) {
+            header('Location: index.php');
+            exit;
+        }
+
+        $filename = $_POST['filename'] ?? '';
+        $fileType = $_POST['file_type'] ?? '';
+
+        // thư mục ĐÃ TỒN TẠI
+        $uploadDir = 'assets/uploads/materials/';
+
+        $ext        = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+        $newName    = uniqid('material_', true) . '.' . $ext;
+        $targetPath = $uploadDir . $newName;
+
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $targetPath)) {
+
+            date_default_timezone_set('Asia/Ho_Chi_Minh');
+            $uploadedAt = date('Y-m-d H:i:s');
+
+            $this->materialModel->addMaterial(
+                $lessonId,
+                $filename,
+                $newName,     // chỉ lưu tên file
+                $fileType,
+                $uploadedAt
+            );
+        }
+        header('Location: index.php?controller=instructor&type=lesson&action=materials&lesson_id=' . $lessonId . '&course_id=' . $courseId);
+        exit;
     }
 }
+
+?>

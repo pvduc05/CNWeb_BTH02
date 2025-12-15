@@ -3,18 +3,21 @@
 require_once 'models/Course.php';
 require_once 'models/Lesson.php';
 require_once 'models/Category.php';
+require_once 'models/User.php';
 
 class CourseController
 {
     private $courseModel;
     private $lessonModel;
     private $categoryModel;
+    private $userModel;
 
     public function __construct()
     {
         $this->courseModel   = new Course();
         $this->lessonModel   = new Lesson();
         $this->categoryModel = new Category();
+        $this->userModel = new User();
     }
 
     //hien thi trang dashboard giang vien
@@ -169,5 +172,14 @@ class CourseController
         $lessons = $this->lessonModel->getAllLessonsByCourseId($courseId);
 
         include_once 'views/instructor/course/manage.php';
+    }
+
+    //hien thi trang danh sach hoc vien da dang ky 1 khoa hoc
+    public function students() : void {
+        $instructorId = isset($_SESSION['user']) ? $_SESSION['user']['id'] : 1;
+
+        $students = $this->userModel->getAllStudentsByInstructorId($instructorId);
+
+        include_once 'views/instructor/students/list.php';
     }
 }
