@@ -1,23 +1,12 @@
 <?php
 session_start(); // Bắt buộc phải có để dùng $_SESSION
 
-// =================================================================================
-// 1. CẤU HÌNH ROUTER CƠ BẢN
-// =================================================================================
-
 // Lấy controller & action từ URL
 $controller = $_GET['controller'] ?? 'home';
 $action     = $_GET['action']     ?? 'index';
 
-// =================================================================================
-// 2. XỬ LÝ ROUTING (ĐIỀU HƯỚNG)
-// =================================================================================
-
 switch ($controller) {
 
-    // -------------------------------------------------------------------------
-    // CASE: AUTH (Đăng nhập, Đăng ký, Đăng xuất) - Từ File 1
-    // -------------------------------------------------------------------------
     case 'auth':
         require_once 'controllers/AuthController.php';
         $auth = new AuthController();
@@ -26,12 +15,6 @@ switch ($controller) {
         elseif ($action == 'logout') $auth->logout();
         break;
 
-    // -------------------------------------------------------------------------
-    // CASE: STUDENT (Học viên) - Từ File 1 & 3
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // CASE: STUDENT (Học viên)
-    // -------------------------------------------------------------------------
     case 'student':
         checkRole(0); // Bắt buộc là học viên
 
@@ -93,11 +76,6 @@ switch ($controller) {
         }
         break;
 
-    // -------------------------------------------------------------------------
-    // CASE: ENROLLMENT (Xử lý các hành động POST form)
-    // -------------------------------------------------------------------------
-    // Case này cần thiết vì trong view my_courses.php và course_progress.php 
-    // bạn đang để form action="index.php?controller=enrollment..."
     case 'enrollment':
         checkRole(0);
         require_once 'controllers/EnrollmentController.php';
@@ -111,29 +89,20 @@ switch ($controller) {
             $enrollmentCtrl->update_progress();
         }
         break;
-    // -------------------------------------------------------------------------
-    // CASE: INSTRUCTOR (Giảng viên) - Lấy logic chi tiết từ File 3
-    // -------------------------------------------------------------------------
+    //--------------------------Giang vien Route Start----------------------------//
     case 'instructor':
-        // Kiểm tra quyền (Role 1: Giảng viên)
-        // checkRole(1); // Bạn có thể bỏ comment nếu muốn bắt buộc check quyền ngay
+        // checkRole(1);
+        $type = $_GET['type'] ?? 'course'; //dang thuc hien thao tac voi doi tuong nao
 
-        $type = $_GET['type'] ?? ''; // đang thực hiện thao tác với đối tượng nào (course hay lesson)
-
-        // Tương tác với đối tượng nào thì tạo controller của đối tượng ấy
+        //tuong tac voi doi tuong nao thi tao controller cua doi tuong ay
         if ($type === 'course') {
             require_once 'controllers/CourseController.php';
             $dynamicController = new CourseController();
         } else if ($type === 'lesson') {
             require_once 'controllers/LessonController.php';
             $dynamicController = new LessonController();
-        } else {
-            // Mặc định nếu không có type thì hiển thị dashboard (Từ File 1)
-            include 'views/instructor/dashboard.php';
-            break;
         }
 
-        // Switch case xử lý các hành động CRUD của giảng viên
         switch ($action) {
             case 'index':
                 $dynamicController->index();
@@ -159,15 +128,27 @@ switch ($controller) {
             case 'manage':
                 $dynamicController->manage();
                 break;
+
+            // Materials actions
+            case 'materials':
+                $dynamicController->materials();
+                break;
+            case 'upload':
+                $dynamicController->upload();
+                break;
+            case 'upload_material':
+                $dynamicController->uploadLogic();
+                break;
+            case 'students':
+                $dynamicController->students();
+                break;
             default:
-                echo 'Hành động không hợp lệ.';
+                echo 'Hanh dong khong hop le.';
                 break;
         }
         break;
+    //--------------------------Giang vien Route End----------------------------//
 
-    // -------------------------------------------------------------------------
-    // CASE: ADMIN (Quản trị viên) - Lấy logic chi tiết từ File 1
-    // -------------------------------------------------------------------------
     case 'admin':
         checkRole(2); // Chỉ Admin mới vào được
         require_once 'controllers/AdminController.php';
@@ -215,11 +196,6 @@ switch ($controller) {
         }
         break;
 
-    // -------------------------------------------------------------------------
-    // DEFAULT: DYNAMIC ROUTING (Xử lý các Controller khác) - Từ File 2
-    // -------------------------------------------------------------------------
-    // Nếu không rơi vào các case đặc biệt (admin, instructor...), 
-    // hệ thống sẽ tự động tìm controller dựa trên tên file.
     default:
         // Tạo tên controller file & class
         $controllerName = ucfirst($controller) . "Controller";
@@ -254,11 +230,7 @@ switch ($controller) {
         break;
 }
 
-// =================================================================================
-// 3. HÀM HỖ TRỢ
-// =================================================================================
-
-// Hàm kiểm tra quyền đơn giản (Từ File 1 & 3)
+// Hàm kiểm tra quyền đơn giản 
 function checkRole($requiredRole)
 {
     if (!isset($_SESSION['user'])) {

@@ -1,7 +1,7 @@
 <?php
 
-// Sử dụng __DIR__ để đường dẫn luôn đúng bất kể file được gọi từ đâu
 require_once __DIR__ . '/../config/Database.php';
+require_once __DIR__ . 'models/Lesson.php';
 
 class Course
 {
@@ -9,23 +9,23 @@ class Course
     private $conn;
     private $table = 'courses';
 
+
     public function __construct()
     {
         $this->conn = Database::getConnection();
     }
 
-    // =================================================================
-    // PHẦN 1: CÁC HÀM DÀNH CHO GIẢNG VIÊN / QUẢN TRỊ (TỪ FILE 1)
-    // =================================================================
-
-    // Lấy toàn bộ khóa học của một giảng viên cụ thể
+    //lay toan bo khoa hoc
     public function getAllCourse(int $instructorId): array
     {
         if ($this->conn === null) {
             return [];
         }
 
-        $sql  = 'SELECT * FROM Courses WHERE instructor_id = :instructor_id';
+        $sql  = 'SELECT c.*, cat.name as category_name FROM Courses c 
+                 LEFT JOIN Categories cat ON c.category_id = cat.id 
+                 WHERE c.instructor_id = :instructor_id 
+                 ORDER BY c.created_at DESC';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':instructor_id' => $instructorId,
@@ -33,14 +33,13 @@ class Course
         return $stmt->fetchAll();
     }
 
-    // Thêm khóa học mới
+    //them khoa hoc moi
     public function addCourse(string $title, string $description, int $instructorId, int $categoryId, float $price, int $durationWeeks, string $level, string $image, string $createdAt): bool
     {
         if ($this->conn === null) {
             return false;
         }
 
-        // Lưu ý: File gốc dùng cột 'level_course'
         $sql = 'INSERT INTO Courses (title, description, instructor_id, category_id, price, duration_weeks, level, image, created_at)
                 VALUES (:title, :description, :instructor_id, :category_id, :price, :duration_weeks, :level, :image, :created_at)';
 
@@ -59,17 +58,16 @@ class Course
         ]);
     }
 
-    // Cập nhật khóa học
+    //cap nhat khoa hoc
     public function updateCourse(int $courseId, string $title, string $description, int $instructorId, int $categoryId, float $price, int $durationWeeks, string $level, string $image, string $updatedAt): bool
     {
         if ($this->conn === null) {
             return false;
         }
 
-        // Lưu ý: File gốc dùng cột 'level_course'
         $sql = 'UPDATE Courses
                 SET title = :title, description = :description, instructor_id = :instructor_id, category_id = :category_id,
-                    price = :price, duration_weeks = :duration_weeks, level_course = :level, image = :image , updated_at = :updated_at
+                    price = :price, duration_weeks = :duration_weeks, level = :level, image = :image , updated_at = :updated_at
                 WHERE id = :course_id';
 
         $stmt = $this->conn->prepare($sql);
@@ -88,50 +86,55 @@ class Course
         ]);
     }
 
-    // Xóa khóa học (và xóa các bài học liên quan)
+    // xoa khoa hoc
     public function deleteCourse(int $courseId): bool
     {
         if ($this->conn === null) {
             return false;
         }
 
-        // Xóa khóa học
-        $sql = 'DELETE FROM Courses WHERE id = :course_id';
+        //xoa tai lieu thuoc bai hoc
+        $sql = 'DELETE m
+            FROM materials m
+            JOIN lessons l ON m.lesson_id = l.id
+            WHERE l.course_id = :course_id';
         $stmt = $this->conn->prepare($sql);
-        $deletedCourseSuccess = $stmt->execute([
-            ':course_id' => $courseId,
-        ]);
+        $deletedMaterialsSuccess = $stmt->execute([':course_id' => $courseId]);
 
-        // Xóa bài học thuộc khóa học
-        $sql = 'DELETE FROM Lessons WHERE course_id = :course_id';
-        $stmt = $this->conn->prepare($sql);
+        //xoa bai hoc thuoc khoa hoc
+        $sql                   = 'DELETE FROM Lessons WHERE course_id = :course_id';
+        $stmt                  = $this->conn->prepare($sql);
         $deletedLessonsSuccess = $stmt->execute([
             ':course_id' => $courseId,
         ]);
 
-        // Nếu xóa khóa học và bài học thành công thi trả về true
-        return $deletedCourseSuccess && $deletedLessonsSuccess;
+        // xoa khoa hoc
+        $sql                  = 'DELETE FROM Courses WHERE id = :course_id';
+        $stmt                 = $this->conn->prepare($sql);
+        $deletedCourseSuccess = $stmt->execute([
+            ':course_id' => $courseId,
+        ]);
+
+        // neu xoa khoa hoc va bai hoc thanh cong thi tra ve true
+        return $deletedMaterialsSuccess && $deletedCourseSuccess && $deletedLessonsSuccess;
     }
 
-    // Lấy thông tin cơ bản khóa học theo ID (Dùng cho form Edit của giảng viên)
+    //lay khoa hoc theo id
     public function getCourseById(int $courseId)
     {
         if ($this->conn === null) {
             return [];
         }
 
-        $sql  = 'SELECT * FROM Courses WHERE id = :course_id';
+        $sql  = 'SELECT c.*, cat.name as category_name FROM Courses c 
+                 LEFT JOIN Categories cat ON c.category_id = cat.id 
+                 WHERE c.id = :course_id';
         $stmt = $this->conn->prepare($sql);
         $stmt->execute([
             ':course_id' => $courseId,
         ]);
         return $stmt->fetch();
     }
-
-    // =================================================================
-    // PHẦN 2: CÁC HÀM DÀNH CHO NGƯỜI DÙNG / PUBLIC (TỪ FILE 2)
-    // =================================================================
-
     // Xem danh sách tất cả khóa học (Public)
     public function getAll()
     {
@@ -200,8 +203,8 @@ class Course
         $stmt->execute(['title' => '%' . $title . '%']);
         return $stmt->fetchAll();
     }
-   //lọc theo id
-   public function filterByCategoryId($categoryId)
+    //lọc theo id
+    public function filterByCategoryId($categoryId)
     {
         $sql_select = "
             SELECT 
@@ -209,7 +212,7 @@ class Course
             FROM " . $this->table . "
         ";
         $params = [];
-        
+
         // Nếu có categoryId hợp lệ, thêm điều kiện WHERE
         if (!empty($categoryId) && is_numeric($categoryId)) {
             $sql_select .= " WHERE category_id = :category_id ";
@@ -217,10 +220,10 @@ class Course
         }
 
         $sql_select .= " ORDER BY id ASC";
-        
+
         $stmt = $this->conn->prepare($sql_select);
         $stmt->execute($params);
-        
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

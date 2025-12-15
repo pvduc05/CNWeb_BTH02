@@ -100,5 +100,35 @@ class Category
         return false;
     }
 
+    // 6. Lọc khóa học theo danh mục (Thêm vào class Category)
+    public function filterByCategory($categoryId)
+    {
+        // Câu truy vấn lấy tất cả khóa học có category_id trùng khớp
+        // Giả định tên bảng khóa học của bạn là 'courses'
+        $query = "SELECT * FROM courses WHERE category_id = :category_id ORDER BY created_at DESC";
 
+        $stmt = $this->conn->prepare($query);
+
+        // Bind tham số (gán giá trị id vào :category_id)
+        $stmt->bindParam(':category_id', $categoryId);
+
+        $stmt->execute();
+
+        // Trả về dạng Mảng (Array) để bên Controller/View dễ dàng foreach
+        // Dùng fetchAll(PDO::FETCH_ASSOC) để lấy mảng kết hợp
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    // 7. Lấy thông tin chi tiết danh mục (dùng cho hàm getCategoryById bên Controller)
+    public function getCategoryById($id)
+    {
+        $query = "SELECT * FROM " . $this->table . " WHERE id = ? LIMIT 0,1";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $id);
+        $stmt->execute();
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Trả về mảng dữ liệu (hoặc null nếu không tìm thấy)
+        return $row ? $row : null;
+    }
 }

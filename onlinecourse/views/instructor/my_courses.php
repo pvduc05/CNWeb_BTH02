@@ -6,6 +6,11 @@ include_once __DIR__ . '/../layouts/header.php';
 if (count($courses) === 0) {
     echo '<p>Không có khoá học nào!</p>';
 }
+if (isset($_GET['message'])) {
+    $message    = urldecode($_GET['message']);
+    $alertClass = strpos($message, 'thành công') !== false ? 'alert-success' : 'alert-danger';
+    echo '<div class="alert ' . $alertClass . '">' . htmlspecialchars($message) . '</div>';
+}
 ?>
 
 <?php foreach ($courses as $course): ?>
@@ -35,6 +40,7 @@ if (count($courses) === 0) {
                             <strong>Giá:</strong> <?= htmlspecialchars($course['price']) ?> |
                             <strong>Thời gian:</strong> <?= htmlspecialchars($course['duration_weeks']) ?> tuần |
                             <strong>Mức độ:</strong> <?= htmlspecialchars($course['level']) ?>
+                            <strong>Danh mục:</strong>
                         </p>
 
                         <p class="mb-2 text-muted">
